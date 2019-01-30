@@ -1,11 +1,16 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/mongodb/mongo-go-driver/bson"
+	"github.com/mongodb/mongo-go-driver/mongo"
 )
 
 type application struct {
@@ -14,6 +19,11 @@ type application struct {
 }
 
 func main() {
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	client, err := mongo.Connect(ctx, "mongodb://localhost:27017")
+	collection := client.Database("testing").Collection("numbers")
+	collection.InsertOne(ctx, bson.M{"name": "pi", "value": 3.14159})
+
 	addr := flag.String("addr", ":4000", "HTTP network adress")
 	flag.Parse()
 
@@ -32,6 +42,6 @@ func main() {
 	}
 
 	infoLog.Print(fmt.Printf("Starting server on %s", *addr))
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 }

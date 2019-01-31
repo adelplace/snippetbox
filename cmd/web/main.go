@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"snippetbox/pkg/models/persistence"
 	"time"
 
 	"github.com/mongodb/mongo-go-driver/bson"
@@ -17,6 +18,7 @@ import (
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	snippets *persistence.SnippetModel
 }
 
 func main() {
@@ -37,6 +39,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		snippets: &persistence.SnippetModel{Client: client},
 	}
 
 	srv := &http.Server{

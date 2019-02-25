@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"strconv"
+
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -33,13 +34,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
-	idInt, err := strconv.Atoi(id)
-	if err != nil || idInt < 1 {
-		app.notFound(w)
-		return
-	}
 
-	fmt.Fprintf(w, "Display a specific snippet with ID %d...", idInt)
+	fmt.Fprintf(w, "Display a specific snippet with ID %s...", id)
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
@@ -49,5 +45,15 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("Create a new snippet..."))
+	id := primitive.NewObjectID()
+	title := "toto"
+	content := "content"
+
+	_, err := app.snippets.Insert(&id, title, content)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/snippet?id=%s", id.Hex()), http.StatusSeeOther)
 }

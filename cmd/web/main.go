@@ -10,7 +10,6 @@ import (
 	"snippetbox/pkg/models/persistence"
 	"time"
 
-	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/mongodb/mongo-go-driver/mongo/readpref"
 )
@@ -30,8 +29,7 @@ func main() {
 	if err != nil {
 		errorLog.Fatal(err)
 	}
-	collection := client.Database("testing").Collection("numbers")
-	collection.InsertOne(ctx, bson.M{"name": "pi", "value": 3.14159})
+	database := client.Database("testing")
 
 	addr := flag.String("addr", ":4000", "HTTP network adress")
 	flag.Parse()
@@ -39,7 +37,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
-		snippets: &persistence.SnippetModel{Client: client},
+		snippets: &persistence.SnippetModel{Database: database},
 	}
 
 	srv := &http.Server{

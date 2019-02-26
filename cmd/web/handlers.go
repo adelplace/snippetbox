@@ -35,7 +35,12 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 
-	fmt.Fprintf(w, "Display a specific snippet with ID %s...", id)
+	result, err := app.snippets.Get(id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	fmt.Fprintf(w, "Display a specific snippet with ID %s...", result.Title)
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {

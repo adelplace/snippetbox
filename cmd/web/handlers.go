@@ -37,10 +37,10 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 
 	result, err := app.snippets.Get(id)
 	if err != nil {
-		app.serverError(w, err)
+		app.notFound(w)
 		return
 	}
-	fmt.Fprintf(w, "Display a specific snippet with ID %s...", result.Title)
+	fmt.Fprintf(w, "Display a specific snippet with title %s...", result.Title)
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
@@ -60,5 +60,7 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/snippet?id=%s", id.Hex()), http.StatusSeeOther)
+	app.infoLog.Print("insert")
+	fmt.Fprintf(w, "Display a specific snippet with ID %s...", id.Hex())
+	//http.Redirect(w, r, fmt.Sprintf("/snippet?id=%s", id.Hex()), http.StatusSeeOther)
 }

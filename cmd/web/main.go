@@ -37,7 +37,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
-		snippets: &persistence.SnippetModel{Database: database},
+		snippets: &persistence.SnippetModel{Collection: database.Collection("snippet")},
 	}
 
 	srv := &http.Server{

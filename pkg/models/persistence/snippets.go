@@ -12,13 +12,13 @@ import (
 
 // SnippetModel mongo
 type SnippetModel struct {
-	Database *mongo.Database
+	Collection *mongo.Collection
 }
 
 // Insert new Snippet
 func (m *SnippetModel) Insert(id *primitive.ObjectID, title, content string) (*mongo.InsertOneResult, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	result, err := m.Database.Collection("snippet").InsertOne(ctx, bson.M{"id": id, "title": title, "content": content})
+	result, err := m.Collection.InsertOne(ctx, bson.M{"_id": id, "title": title, "content": content})
 	if err != nil {
 		return nil, err
 	}
@@ -31,8 +31,12 @@ func (m *SnippetModel) Get(id string) (*models.Snippet, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	var result = models.Snippet{}
-	filter := bson.M{"id": id}
-	err := m.Database.Collection("snippet").FindOne(ctx, filter).Decode(&result)
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": objectID}
+	err = m.Collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		return nil, err
 	}

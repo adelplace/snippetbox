@@ -8,6 +8,7 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"github.com/mongodb/mongo-go-driver/mongo"
+	"github.com/mongodb/mongo-go-driver/mongo/options"
 )
 
 // SnippetModel mongo
@@ -27,16 +28,15 @@ func (m *SnippetModel) Insert(id *primitive.ObjectID, title, content string) (*m
 }
 
 // Get a snippet
-func (m *SnippetModel) Get(id string) (*models.Snippet, error) {
+func (m *SnippetModel) Get(id primitive.ObjectID) (*models.Snippet, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	var result = models.Snippet{}
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
+	filter := bson.M{"_id": id}
+	err := m.Collection.FindOne(ctx, filter).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		return nil, models.ErrNoRecord
 	}
-	filter := bson.M{"_id": objectID}
-	err = m.Collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -46,5 +46,18 @@ func (m *SnippetModel) Get(id string) (*models.Snippet, error) {
 
 // Latest inserted Snippet
 func (m *SnippetModel) Latest() ([]*models.Snippet, error) {
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+	filter := bson.M{}
+	options := options.FindOptions{Sort: bson.M{"id": -1}}
+	result, err := m.Collection.Find(ctx, filter, &options)
+	if err != nil {
+		return nil, err
+	}
+
+	for result.Next(ctx) {
+
+	}
+
 	return nil, nil
 }

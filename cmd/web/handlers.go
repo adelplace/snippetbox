@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"snippetbox/pkg/models"
 
 	"github.com/mongodb/mongo-go-driver/bson/primitive"
 )
@@ -35,12 +36,21 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 
-	result, err := app.snippets.Get(id)
+	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		app.notFound(w)
 		return
 	}
-	fmt.Fprintf(w, "Display a specific snippet with title %s...", result.Title)
+	result, err := app.snippets.Get(objectID)
+	if err == models.ErrNoRecord {
+		app.notFound(w)
+		return
+	}
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	fmt.Fprintf(w, "%v", result)
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {

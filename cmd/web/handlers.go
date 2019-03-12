@@ -50,7 +50,25 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	fmt.Fprintf(w, "%v", result)
+
+	files := []string{
+		"./ui/html/show.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	data := templateData{Snippet: result}
+
+	err = ts.Execute(w, data)
+	if err != nil {
+		app.serverError(w, err)
+	}
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
@@ -72,5 +90,4 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 
 	app.infoLog.Print("insert")
 	fmt.Fprintf(w, "Display a specific snippet with ID %s...", id.Hex())
-	//http.Redirect(w, r, fmt.Sprintf("/snippet?id=%s", id.Hex()), http.StatusSeeOther)
 }

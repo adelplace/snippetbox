@@ -19,7 +19,7 @@ type SnippetModel struct {
 // Insert new Snippet
 func (m *SnippetModel) Insert(id *primitive.ObjectID, title, content string) (*mongo.InsertOneResult, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	result, err := m.Collection.InsertOne(ctx, bson.M{"_id": id, "title": title, "content": content})
+	result, err := m.Collection.InsertOne(ctx, bson.M{"_id": id, "title": title, "content": content, "created": time.Now()})
 	if err != nil {
 		return nil, err
 	}

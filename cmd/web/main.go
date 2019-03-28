@@ -7,8 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"snippetbox/pkg/models/persistence"
 	"time"
+
+	"github.com/adelplace/snippetbox/pkg/models/persistence"
 
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/mongodb/mongo-go-driver/mongo/readpref"

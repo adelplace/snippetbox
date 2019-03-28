@@ -2,8 +2,9 @@ package persistence
 
 import (
 	"context"
-	"snippetbox/pkg/models"
 	"time"
+
+	"github.com/adelplace/snippetbox/pkg/models"
 
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/primitive"

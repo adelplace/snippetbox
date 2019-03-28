@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"snippetbox/pkg/models"
+
+	"github.com/adelplace/snippetbox/pkg/models"
 
 	"github.com/mongodb/mongo-go-driver/bson/primitive"
 )
@@ -63,7 +64,7 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := templateData{Snippet: result}
+	data := &templateData{Snippet: result}
 
 	err = ts.Execute(w, data)
 	if err != nil {

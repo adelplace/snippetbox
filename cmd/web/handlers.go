@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 
 	"github.com/adelplace/snippetbox/pkg/models"
@@ -14,24 +13,20 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		app.notFound(w)
 		return
+
 	}
 
-	files := []string{
-		"./ui/html/home.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
+	result, err := app.snippets.Latest()
+	if err == models.ErrNoRecord {
+		app.notFound(w)
+		return
 	}
-
-	ts, err := template.ParseFiles(files...)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	err = ts.Execute(w, nil)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	app.render(w, r, "home.page.tmpl", &templateData{Snippets: result})
 }
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
@@ -52,24 +47,7 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/show.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{Snippet: result}
-
-	err = ts.Execute(w, data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	app.render(w, r, "show.page.tmpl", &templateData{Snippet: result})
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {

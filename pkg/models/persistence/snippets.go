@@ -56,9 +56,17 @@ func (m *SnippetModel) Latest() ([]*models.Snippet, error) {
 		return nil, err
 	}
 
-	for result.Next(ctx) {
+	snippets := []*models.Snippet{}
 
+	for result.Next(ctx) {
+		s := models.Snippet{}
+		err = result.Decode(&s)
+		if err != nil {
+			return nil, err
+		}
+
+		snippets = append(snippets, &s)
 	}
 
-	return nil, nil
+	return snippets, nil
 }

@@ -1,17 +1,17 @@
 {{template "base" .}}
 
-{{define "title"}}Snippet #{{.Snippet.ID}}{{end}}
+{{define "title"}}Snippet #{{.Snippet.ID.Hex}}{{end}}
 
 {{define "body"}}
     {{with .Snippet}}
         <div class="snippet">
             <div class="metadata">
-                <strong>{{.Snippet.Title}}</strong>
-                <strong>#{{.Snippet.ID}}</strong>
+                <strong>{{.Title}}</strong>
+                <strong>#{{.ID.Hex}}</strong>
             </div>
-            <pre><code>{{.Snippet.Content}}</code></pre>
+            <pre><code>{{.Content}}</code></pre>
             <div class="metadata">
-                <time>{{.Snippet.Created}}</time>
+                <time>{{.Created}}</time>
             </div>
         </div>
     {{end}}

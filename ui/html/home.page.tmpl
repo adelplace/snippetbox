@@ -14,7 +14,7 @@
             {{range .Snippets}}
             <tr>
                 <td><a href="/snippet?id={{.ID.Hex}}">{{.Title}}</a></td>
-                <td>{{.Created}}</td>
+                <td>{{humanDate .Created}}</td>
                 <td>#{{.ID.Hex}}</td>
             </tr>
             {{end}}

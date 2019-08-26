@@ -24,7 +24,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) createSnippetForm(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Create a new snippet"))
+	app.render(w, r, "create.page.tmpl", nil)
 }
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
@@ -53,16 +53,21 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
-	id := primitive.NewObjectID()
-	title := "toto"
-	content := "content"
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
-	_, err := app.snippets.Insert(&id, title, content)
+	id := primitive.NewObjectID()
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+
+	_, err = app.snippets.Insert(&id, title, content)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	app.infoLog.Print("insert")
-	fmt.Fprintf(w, "Display a specific snippet with ID %s...", id.Hex())
+	http.Redirect(w, r, fmt.Sprintf("/snippet/%s", id.Hex()), http.StatusSeeOther)
 }

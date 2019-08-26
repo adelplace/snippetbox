@@ -41,3 +41,8 @@
   name = "github.com/justinas/alice"
   branch = "master"
   source = "github.com/justinas/alice"
+
+[[constraint]]
+  name = "github.com/bmizerany/pat"
+  branch = "master"
+  source = "github.com/bmizerany/pat"

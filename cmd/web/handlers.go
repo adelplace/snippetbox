@@ -10,11 +10,6 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		app.notFound(w)
-		return
-	}
-
 	result, err := app.snippets.Latest()
 	if err == models.ErrNoRecord {
 		app.notFound(w)
@@ -28,8 +23,16 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "home.page.tmpl", &templateData{Snippets: result})
 }
 
+func (app *application) createSnippetForm(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Create a new snippet"))
+}
+
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
+	id := r.URL.Query().Get(":id")
+	if id == "" {
+		app.notFound(w)
+		return
+	}
 
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -50,12 +53,6 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		w.Header().Set("Allow", "POST")
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
-
 	id := primitive.NewObjectID()
 	title := "toto"
 	content := "content"
